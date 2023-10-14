@@ -19,11 +19,12 @@
 class eeprom {
     public:
         eeprom();
-        void execute74HC595(unsigned int data);
-        void execute74HC245(int DIRECTION, unsigned char data);
+        void write(unsigned char address, unsigned char data);
+        void read(unsigned int address);
+        void readAll();
+        void writeAll();
     private:
-        void config74HC595();
-        void config74HC245(int RW);
+        void configure();
 };
 
 #endif

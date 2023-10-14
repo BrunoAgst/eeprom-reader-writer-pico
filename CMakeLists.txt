@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 
 add_executable(eeprom
-	main.cpp
+	./src/main.cpp
 	)
 
 target_link_libraries(eeprom pico_stdlib)

@@ -1,6 +1,7 @@
 #include "eeprom.hpp"
 #include <iostream>
 #include <iomanip>
+#include <vector>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "../lib/74HC595/C74HC595.cpp"
@@ -9,13 +10,13 @@ eeprom::eeprom(){
     configureAT28C16();
 }
 
-void eeprom::menu(unsigned int option, unsigned int address, unsigned int data){
+void eeprom::menu(unsigned int option, unsigned int address, unsigned int data, std::vector<unsigned int> dataList){
     switch(option){
         case 1:
             write(address, data);
             break;
         case 2:
-            writeAll();
+            writeAll(dataList);
             break;
         case 3:
             { 
@@ -80,21 +81,20 @@ void eeprom::write(unsigned int address, unsigned int data){
 
 }
 
-void eeprom::writeAll(){
+void eeprom::writeAll(std::vector<unsigned int> data){
+
     c74hc595 ci595;
 
     configureWriteEEPROM();
-    unsigned int data = 0;
     std::cout << "Recording..." << std::endl;
-    for(int i = 0; i < 256; i++){
+    for(int i = 0; i < data.size(); i++){
         ci595.setAddress(i);
         gpio_put(OE, 1);
-        wData(data);
+        wData(data[i]);
         gpio_put(WE, 0);
         sleep_ms(1);
         gpio_put(WE, 1);
         sleep_ms(5);
-        data++;
     }
     
     std::cout << "Finish" << std::endl;

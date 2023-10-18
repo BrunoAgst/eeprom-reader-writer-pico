@@ -1,6 +1,8 @@
 #ifndef EEPROM
 #define EEPROM
 
+#include <vector>
+
 #define OE 3
 #define WE 2
 
@@ -16,11 +18,11 @@
 class eeprom {
     public:
         eeprom();
-        void menu(unsigned int option, unsigned int address = 0, unsigned int data = 0);
+        void menu(unsigned int option, unsigned int address = 0, unsigned int data = 0, std::vector<unsigned int> dataList = {});
         void write(unsigned int address, unsigned int data);
         unsigned int read(unsigned int address);
         void readAll();
-        void writeAll();
+        void writeAll(std::vector<unsigned int> data);
     private:
         void configureAT28C16();
         void configureWriteEEPROM();

@@ -9,7 +9,7 @@
 class c74hc595 {
     public:
         c74hc595();
-        void setAddress(unsigned char address);
+        void setAddress(unsigned int address);
     private:
         void configure();
 };

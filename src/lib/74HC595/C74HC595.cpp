@@ -23,12 +23,12 @@ void c74hc595::configure(){
     gpio_put(SH_CP, 0);
 }
 
-void c74hc595::setAddress(unsigned char address){
-    std::cout << "74HC595:" << std::endl;
+void c74hc595::setAddress(unsigned int address){
+    std::cout << "74HC595 SET ADDRESS" << std::endl;
     for(int i = 0; i < 8; i++){
         gpio_put(DATA, address & (1 << (7 - i)) ? 1 : 0);
         gpio_put(SH_CP, 1);
-        sleep_ms(5);
+        sleep_ms(1);
         gpio_put(SH_CP, 0);
     }
     gpio_put(ST_CP, 1);

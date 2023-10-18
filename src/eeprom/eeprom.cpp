@@ -1,5 +1,6 @@
 #include "eeprom.hpp"
 #include <iostream>
+#include <iomanip>
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "../lib/74HC595/C74HC595.cpp"
@@ -8,9 +9,27 @@ eeprom::eeprom(){
     configureAT28C16();
 }
 
-void eeprom::menu(unsigned int option){
-    unsigned int data = read(0x01);
-    std::cout << "Data: " << data << std::endl;
+void eeprom::menu(unsigned int option, unsigned int address, unsigned int data){
+    switch(option){
+        case 1:
+            write(address, data);
+            break;
+        case 2:
+            writeAll();
+            break;
+        case 3:
+            { 
+                unsigned int dataValue = read(address);
+                std::cout << "Data: " "0x" << std::setfill('0') << std::setw(2) << std::hex << dataValue << std::endl; 
+                break;
+            }
+        case 4:
+            readAll();
+            break;
+        default:
+            std::cout << "Invalid Option" << std::endl;
+            break;
+    }
 }
 
 unsigned int eeprom::read(unsigned int address){
@@ -22,9 +41,31 @@ unsigned int eeprom::read(unsigned int address){
     return rData();
 }
 
-void eeprom::readAll(){}
+void eeprom::readAll(){
+    c74hc595 ci595;
 
-void eeprom::write(unsigned int address, unsigned char data){
+    configureReadEEPROM();
+    gpio_put(OE, 0);
+    unsigned int data = 0;
+    int line = 0;
+
+    std::cout << "---------------------------------------------------------------------------------------------------" << std::endl;
+    for(int i = 0; i < 256; i++){
+        ci595.setAddress(i);
+        data = rData();
+        if(line == 20){
+            std::cout << "\n";
+            line = 0;
+        }
+        std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << data << " ";
+        line++;
+        sleep_ms(5);
+    }
+    std::cout << "\n---------------------------------------------------------------------------------------------------" << std::endl;
+
+}
+
+void eeprom::write(unsigned int address, unsigned int data){
     c74hc595 ci595;
 
     ci595.setAddress(address);
@@ -35,10 +76,30 @@ void eeprom::write(unsigned int address, unsigned char data){
     sleep_ms(1);
     gpio_put(WE, 1);
     sleep_ms(1);
+    std::cout << "Record " << "0x" << std::setfill('0') << std::setw(2) << std::hex << data << " in  address" << "0x" << std::setfill('0') << std::setw(2) << std::hex << address << std::endl; 
+
 }
 
+void eeprom::writeAll(){
+    c74hc595 ci595;
 
-void eeprom::writeAll(){}
+    configureWriteEEPROM();
+    unsigned int data = 0;
+    std::cout << "Recording..." << std::endl;
+    for(int i = 0; i < 256; i++){
+        ci595.setAddress(i);
+        gpio_put(OE, 1);
+        wData(data);
+        gpio_put(WE, 0);
+        sleep_ms(1);
+        gpio_put(WE, 1);
+        sleep_ms(5);
+        data++;
+    }
+    
+    std::cout << "Finish" << std::endl;
+
+}
 
 void eeprom::configureAT28C16(){
     stdio_init_all();
@@ -106,8 +167,7 @@ void eeprom::configureReadEEPROM(){
     gpio_set_dir(B7, GPIO_IN);
 }
 
-void eeprom::wData(unsigned char data){
-    std::cout << "WRITE EEPROM" << std::endl;
+void eeprom::wData(unsigned int data){
     for(int i = B0; i <= B7; i++){
         gpio_put(i, data & (1 << (15 - i)) ? 1 : 0);
         sleep_ms(1);
@@ -116,7 +176,6 @@ void eeprom::wData(unsigned char data){
 
 unsigned int eeprom::rData(){
     unsigned int data = 0;
-    std::cout << "READ EEPROM" << std::endl;
     for(int i = B0; i <= B7; i++){
         int dataValue = gpio_get(i);
         data = (data << 1) + dataValue;

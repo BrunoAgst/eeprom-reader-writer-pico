@@ -16,8 +16,8 @@
 class eeprom {
     public:
         eeprom();
-        void menu(unsigned int option);
-        void write(unsigned int address, unsigned char data);
+        void menu(unsigned int option, unsigned int address = 0, unsigned int data = 0);
+        void write(unsigned int address, unsigned int data);
         unsigned int read(unsigned int address);
         void readAll();
         void writeAll();
@@ -25,7 +25,7 @@ class eeprom {
         void configureAT28C16();
         void configureWriteEEPROM();
         void configureReadEEPROM();
-        void wData(unsigned char data);
+        void wData(unsigned int data);
         unsigned int rData();
 };
 

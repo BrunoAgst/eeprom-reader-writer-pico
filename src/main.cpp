@@ -2,5 +2,5 @@
 
 int main(){
     eeprom e;
-    e.menu(1);
+    e.menu(3, 0x00);
 }

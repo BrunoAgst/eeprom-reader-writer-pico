@@ -19,11 +19,11 @@ class eeprom {
     public:
         eeprom();
         void menu(unsigned int option, unsigned int address = 0, unsigned int data = 0, std::vector<unsigned int> dataList = {});
+    private:
         void write(unsigned int address, unsigned int data);
         unsigned int read(unsigned int address);
         void readAll();
         void writeAll(std::vector<unsigned int> data);
-    private:
         void configureAT28C16();
         void configureWriteEEPROM();
         void configureReadEEPROM();
